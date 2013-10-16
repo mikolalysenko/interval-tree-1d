@@ -1,0 +1,37 @@
+{
+  "name": "interval-tree-1d",
+  "version": "0.0.0",
+  "description": "1D interval tree data structure",
+  "main": "interval-tree.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "binary-search-bounds": "~0.1.0"
+  },
+  "devDependencies": {
+    "tape": "~2.0.0",
+    "tap": "~0.4.4"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/interval-tree-1d.git"
+  },
+  "keywords": [
+    "point",
+    "location",
+    "interval",
+    "range",
+    "query",
+    "search",
+    "overlap"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mikolalysenko/interval-tree-1d/issues"
+  }
+}
