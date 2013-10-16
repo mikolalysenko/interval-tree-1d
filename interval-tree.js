@@ -45,7 +45,6 @@ function rebuildWithInterval(node, interval) {
 }
 
 function rebuildWithoutInterval(node, interval) {
-  console.log("REBUILD!")
   var intervals = node.intervals([])
   var idx = intervals.indexOf(interval)
   if(idx < 0) {
