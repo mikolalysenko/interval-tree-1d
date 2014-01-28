@@ -67,37 +67,29 @@ proto.intervals = function(result) {
 }
 
 proto.insert = function(interval) {
-  console.log("insert into:", this.mid, interval[0], interval[1])
   var weight = this.count - this.leftPoints.length
   this.count += 1
   if(interval[1] < this.mid) {
     if(this.left) {
       if(4*(this.left.count+1) > 3*(weight+1)) {
-        console.log("rebuild left")
         rebuildWithInterval(this, interval)
       } else {
-        console.log("insert left")
         this.left.insert(interval)
       }
     } else {
-      console.log("create left")
       this.left = createIntervalTree([interval])
     }
   } else if(interval[0] > this.mid) {
     if(this.right) {
       if(4*(this.right.count+1) > 3*(weight+1)) {
-        console.log("rebuild right")
         rebuildWithInterval(this, interval)
       } else {
-        console.log("insert right")
         this.right.insert(interval)
       }
     } else {
-      console.log("create right")
       this.right = createIntervalTree([interval])
     }
   } else {
-    console.log("add to tree")
     var l = bounds.ge(this.leftPoints, interval, compareBegin)
     var r = bounds.ge(this.rightPoints, interval, compareEnd)
     this.leftPoints.splice(l, 0, interval)
@@ -106,7 +98,6 @@ proto.insert = function(interval) {
 }
 
 proto.remove = function(interval) {
-  console.log("remove", this.mid, interval[0], interval[1])
   var weight = this.count - this.leftPoints
   if(interval[1] < this.mid) {
     if(!this.left) {
@@ -114,10 +105,8 @@ proto.remove = function(interval) {
     }
     var rw = this.right ? this.right.count : 0
     if(4 * rw > 3 * (weight-1)) {
-      console.log("rebuild left")
       return rebuildWithoutInterval(this, interval)
     }
-    console.log("remove left")
     var r = this.left.remove(interval)
     if(r === EMPTY) {
       this.left = null
@@ -133,7 +122,6 @@ proto.remove = function(interval) {
     }
     var lw = this.left ? this.left.count : 0
     if(4 * lw > 3 * (weight-1)) {
-      console.log("rebuild right")
       return rebuildWithoutInterval(this, interval)
     }
     var r = this.right.remove(interval)
@@ -146,7 +134,6 @@ proto.remove = function(interval) {
     }
     return r
   } else {
-    console.log("remove from tree")
     if(this.count === 1) {
       if(this.leftPoints[0] === interval) {
         return EMPTY
@@ -155,14 +142,12 @@ proto.remove = function(interval) {
       }
     }
     if(this.leftPoints.length === 1 && this.leftPoints[0] === interval) {
-      console.log("only interval in tree")
       if(this.left && this.right) {
         var p = this
         var n = this.left
         while(n.right) {
           p = n
           n = n.right
-          console.log("n=", n.mid)
         }
         if(p === this) {
           n.right = this.right
@@ -175,13 +160,10 @@ proto.remove = function(interval) {
           n.right = r
         }
         copy(this, n)
-        console.log("copy from n")
         this.count = (this.left?this.left.count:0) + (this.right?this.right.count:0) + this.leftPoints.length
       } else if(this.left) {
-        console.log("copy left")
         copy(this, this.left)
       } else {
-        console.log("copy right")
         copy(this, this.right)
       }
       return SUCCESS
@@ -217,13 +199,6 @@ function compareXEnd(x, y) {
 }
 
 proto.queryPoint = function(x, cb) {
-  console.log("visit interval", x, this.mid, 
-      this.leftPoints.map(function(v) { 
-        return [v[0], v[1]]
-      }), 
-      this.rightPoints.map(function(v) {
-        return [v[0], v[1]]
-      }))
   if(x < this.mid) {
     if(this.left) {
       var r = this.left.queryPoint(x, cb)
@@ -351,7 +326,6 @@ function IntervalTree(root) {
 var tproto = IntervalTree.prototype
 
 tproto.insert = function(interval) {
-  console.log("inserting interval")
   if(this.root) {
     this.root.insert(interval)
   } else {
@@ -360,7 +334,6 @@ tproto.insert = function(interval) {
 }
 
 tproto.remove = function(interval) {
-  console.log("removing interval")
   if(this.root) {
     var r = this.root.remove(interval)
     if(r === EMPTY) {
