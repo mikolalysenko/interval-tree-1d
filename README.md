@@ -2,6 +2,8 @@ interval-tree-1d
 ================
 A simple 1D interval tree.  Supports O(log(n)) amortized updates and O(log(n)) queries.
 
+**Work in progress**
+
 # API
 
 ```javascript
