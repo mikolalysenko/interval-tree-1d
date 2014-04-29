@@ -1,20 +1,19 @@
 {
   "name": "interval-tree-1d",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "1D interval tree data structure",
   "main": "interval-tree.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "binary-search-bounds": "~0.1.0"
+    "binary-search-bounds": "^1.0.0"
   },
   "devDependencies": {
-    "tape": "~2.0.0",
-    "tap": "~0.4.4"
+    "tape": "^2.12.3"
   },
   "scripts": {
-    "test": "tap test/*.js"
+    "test": "tape test/*.js"
   },
   "repository": {
     "type": "git",
