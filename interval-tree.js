@@ -252,7 +252,7 @@ proto.queryInterval = function(lo, hi, cb) {
   if(hi < this.mid) {
     var r = reportRange(this.leftPoints, lo, hi, cb, compareXBegin)
     if(r) { return r }
-  } else if(this.lo > this.mid) {
+  } else if(lo > this.mid) {
     var r = reportRange(this.rightPoints, lo, hi, cb, compareXEnd)
     if(r) { return r }
   } else {

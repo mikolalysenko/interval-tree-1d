@@ -16,7 +16,7 @@ for(var i=intervals.length-1; i>=5; --i) {
   t.remove(intervals[i])
 }
 
-console.log(util.inspect(t, {depth:10}))
+//console.log(util.inspect(t, {depth:10}))
 
 /*
 for(var i=-1; i<10; i+=1) {
@@ -29,5 +29,4 @@ for(var i=-1; i<10; i+=1) {
 
 t.queryInterval(-2, 5, function(i) {
   console.log(i)
-
 })
