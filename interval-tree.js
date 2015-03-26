@@ -227,17 +227,31 @@ proto.queryPoint = function(x, cb) {
   }
 }
 
-function reportRange(arr, lo, hi, cb, cmp) {
-  //Range search on left points
-  var a = bounds.ge(arr, lo, cmp)
-  var b = bounds.le(arr, hi, cmp, a)
-  if(b < arr.length && cmp(hi, arr[b]) === 0) {
-    ++b
-  }
-  for(var i=a; i<b; ++i) {
-    var r = cb(arr[i])
+function reportInterval(interval, lo, hi, cb) {
+  if(lo <= interval[1] && hi >= interval[0]) {
+    var r = cb(interval)
     if(r) { return r }
   }
+}
+
+function reportLeftRange(arr, lo, hi, cb) {
+  //Range search on left points
+  var a = 0
+  var b = Math.min(arr.length, bounds.gt(arr, hi, compareXBegin, a))
+  for(var i=a; i<b; ++i) {
+    var r = reportInterval(arr[i], lo, hi, cb);
+    if(r) { return r }
+  }
+}
+
+function reportRightRange(arr, lo, hi, cb, cmp) {
+    //Range search on right points
+    var a = Math.max(0, bounds.ge(arr, lo, compareXEnd))
+    var b = arr.length;
+    for(var i=a; i<b; ++i) {
+        var r = reportInterval(arr[i], lo, hi, cb);
+        if(r) { return r }
+    }
 }
 
 proto.queryInterval = function(lo, hi, cb) {
@@ -250,10 +264,10 @@ proto.queryInterval = function(lo, hi, cb) {
     if(r) { return r }
   }
   if(hi < this.mid) {
-    var r = reportRange(this.leftPoints, lo, hi, cb, compareXBegin)
+    var r = reportLeftRange(this.leftPoints, lo, hi, cb)
     if(r) { return r }
   } else if(lo > this.mid) {
-    var r = reportRange(this.rightPoints, lo, hi, cb, compareXEnd)
+    var r = reportRightRange(this.rightPoints, lo, hi, cb)
     if(r) { return r }
   } else {
     for(var i=0; i<this.leftPoints.length; ++i) {
