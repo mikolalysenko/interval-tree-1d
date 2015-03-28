@@ -178,30 +178,32 @@ tape('fuzz test', function(t) {
 })
 
 tape('containment', function(t) {
-  var tree = createIntervalTree([[0, 100]]);
+  var tree = createIntervalTree([[0, 100]])
   var count = 0
-  tree.queryInterval(10, 20, function(i) { count++; })
+  function incr() { count++ }
+
+  tree.queryInterval(10, 20, incr)
   t.equals(count, 1)
 
-  var count = 0;
-  tree.queryInterval(100, 100, function(i) { count++; });
+  count = 0;
+  tree.queryInterval(100, 100, incr)
   t.equals(count, 1)
 
-  var count = 0;
-  tree.queryInterval(110, 111, function(i) { count++; });
+  count = 0;
+  tree.queryInterval(110, 111, incr)
   t.equals(count, 0)
 
-  var tree = createIntervalTree([[0, 20], [30, 50]]);
-  var count = 0;
-  tree.queryInterval(10, 15, function(i) { count++; });
+  var tree = createIntervalTree([[0, 20], [30, 50]])
+  count = 0
+  tree.queryInterval(10, 15, incr)
   t.equals(count, 1)
 
-  var count = 0;
-  tree.queryInterval(25, 26, function(i) { count++; });
+  count = 0
+  tree.queryInterval(25, 26, incr)
   t.equals(count, 0)
 
-  var count = 0;
-  tree.queryInterval(35, 40, function(i) { count++; });
+  count = 0
+  tree.queryInterval(35, 40, incr)
   t.equals(count, 1)
 
   t.end()

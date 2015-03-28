@@ -183,7 +183,6 @@ proto.remove = function(interval) {
             return SUCCESS
           }
         }
-        throw new Error("This should never happen")
       }
     }
     return NOT_FOUND

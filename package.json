@@ -10,10 +10,12 @@
     "binary-search-bounds": "^1.0.0"
   },
   "devDependencies": {
+    "covert": "^1.0.1",
     "tape": "^3.5.0"
   },
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "tape test/test.js",
+    "coverage": "covert test/test.js"
   },
   "repository": {
     "type": "git",
