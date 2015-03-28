@@ -227,31 +227,21 @@ proto.queryPoint = function(x, cb) {
   }
 }
 
-function reportInterval(interval, lo, hi, cb) {
-  if(lo <= interval[1] && hi >= interval[0]) {
-    var r = cb(interval)
-    if(r) { return r }
-  }
-}
-
 function reportLeftRange(arr, lo, hi, cb) {
-  //Range search on left points
-  var a = 0
-  var b = Math.min(arr.length, bounds.gt(arr, hi, compareXBegin, a))
-  for(var i=a; i<b; ++i) {
-    var r = reportInterval(arr[i], lo, hi, cb);
+  var b = bounds.gt(arr, hi, compareXBegin)
+  for(var i=0; i<b; ++i) {
+    var r = cb(arr[i])
     if(r) { return r }
   }
 }
 
-function reportRightRange(arr, lo, hi, cb, cmp) {
-    //Range search on right points
-    var a = Math.max(0, bounds.ge(arr, lo, compareXEnd))
-    var b = arr.length;
-    for(var i=a; i<b; ++i) {
-        var r = reportInterval(arr[i], lo, hi, cb);
-        if(r) { return r }
-    }
+function reportRightRange(arr, lo, hi, cb) {
+  var a = bounds.ge(arr, lo, compareXEnd)
+  var b = arr.length
+  for(var i=a; i<b; ++i) {
+    var r = cb(arr[i])
+    if(r) { return r }
+  }
 }
 
 proto.queryInterval = function(lo, hi, cb) {
@@ -365,7 +355,7 @@ tproto.queryPoint = function(p, cb) {
 }
 
 tproto.queryInterval = function(lo, hi, cb) {
-  if(this.root) {
+  if(lo <= hi && this.root) {
     return this.root.queryInterval(lo, hi, cb)
   }
 }
@@ -389,7 +379,7 @@ Object.defineProperty(tproto, "intervals", {
 })
 
 function createWrapper(intervals) {
-  if(intervals.length === 0 || !intervals) {
+  if(!intervals || intervals.length === 0) {
     return new IntervalTree(null)
   }
   return new IntervalTree(createIntervalTree(intervals))

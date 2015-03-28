@@ -2,6 +2,8 @@ interval-tree-1d
 ================
 A simple 1D interval tree.  Supports O(log(n)) amortized updates and O(log(n)) queries.
 
+[![build status](https://secure.travis-ci.org/mikolalysenko/interval-tree-1d.png)](http://travis-ci.org/mikolalysenko/interval-tree-1d)
+
 # Example
 
 ```javascript
@@ -52,4 +54,4 @@ Visits all intervals containing the point p
 Returns all intervals which intersect the interval `[lo, hi]`
 
 # Credits
-(c) 2013 Mikola Lysenko. MIT License
+(c) 2013-2015 Mikola Lysenko. MIT License

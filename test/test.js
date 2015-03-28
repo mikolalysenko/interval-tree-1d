@@ -1,84 +1,208 @@
-var util = require("util")
+var util = require('util')
+var tape = require('tape')
 
-var createIntervalTree = require("../interval-tree.js")
+var createIntervalTree = require('../interval-tree.js')
 
-//var intervals = [[0, 1], [0.5, 2], [3, 4], [2, 4], [1, 4], [3, 10], [-100, 1000]]
-
-var intervals = [[0, 1], [2,3], [3.1,4], [4, 5], [6, 7], [7,8], [8,9], [9,10], [10, 11], [11,12], [12, 13], [13,14], [14,15]]
-
-var t = createIntervalTree([intervals[0]])
-
-for(var i=1; i<intervals.length; ++i) {
-  t.insert(intervals[i])
+function cmpInterval(a, b) {
+  var d = a[0] - b[0]
+  if(d) { return d }
+  return a[1] - b[1]
 }
 
-for(var i=intervals.length-1; i>=5; --i) {
-  t.remove(intervals[i])
-}
+tape('fuzz test', function(t) {
+  function verifyTree(tree, intervals) {
+    function testInterval(x) {
+      var expected = []
+      if(x[0] <= x[1])
+      for(var j=0; j<intervals.length; ++j) {
+        var y = intervals[j]
+        if(x[1] >= y[0] && y[1] >= x[0]) {
+          expected.push(y)
+        }
+      }
+      expected.sort(cmpInterval)
 
-//console.log(util.inspect(t, {depth:10}))
+      var actual = []
+      tree.queryInterval(x[0], x[1], function(j) {
+        actual.push(j)
+      })
+      actual.sort(cmpInterval)
 
-for(var i=-1; i<10; i+=1) {
-  console.log("search:", i)
-  t.queryPoint(i, function(interval) {
-    console.log(i, " in ", interval)
-  })
-}
-
-t.queryInterval(-2, 5, function(i) {
-  console.log(i)
-});
-
-// Test query of whole interval
-(function() {
-    var t = createIntervalTree(intervals);
-
-    var count = 0;
-    t.queryInterval(-1, 100, function(i) { count++; });
-    if(count != intervals.length) {
-        console.log("W1. Failure!  Found only " + count + " of " + intervals.length);
+      t.same(actual, expected, 'query interval: ' + x)
     }
-})();
-
-// Test query of enclosed intervals
-(function() {
-    var t = createIntervalTree([[0, 100]]);
-
-    var count = 0;
-    t.queryInterval(10, 20, function(i) { count++; });
-    if(count != 1) {
-        console.log("I1. Failure!  Found only " + count + " of 1");
+    for(var i=0; i<intervals.length; ++i) {
+      testInterval(intervals[i])
+    }
+    testInterval([-Infinity, Infinity])
+    testInterval([0,0])
+    testInterval([Infinity, -Infinity])
+    for(var i=0; i<100; ++i) {
+      testInterval([Math.random(), 2*Math.random()])
     }
 
-    var count = 0;
-    t.queryInterval(100, 100, function(i) { count++; });
-    if(count != 1) {
-        console.log("I2. Failure!  Found only " + count + " of 1");
+    //Verify queryPoint
+    function testPoint(p) {
+      var expected = []
+      for(var j=0; j<intervals.length; ++j) {
+        var y = intervals[j]
+        if(y[0] <= p && p <= y[1]) {
+          expected.push(y)
+        }
+      }
+      expected.sort(cmpInterval)
+
+      var actual = []
+      tree.queryPoint(p, function(y) {
+        actual.push(y)
+      })
+      actual.sort(cmpInterval)
+
+      t.same(actual, expected, 'query point: ' + p)
+    }
+    for(var i=0; i<intervals.length; ++i) {
+      testPoint(intervals[i][0])
+      testPoint(intervals[i][1])
+    }
+    testPoint(0)
+    testPoint(-1)
+    testPoint(1)
+    testPoint(-Infinity)
+    testPoint(Infinity)
+    for(var i=0; i<100; ++i) {
+      testPoint(Math.random())
     }
 
-    var count = 0;
-    t.queryInterval(110, 111, function(i) { count++; });
-    if(count != 0) {
-        console.log("I3. Failure!  Found " + count + " of 0");
-    }
+    //Check tree contents
+    t.equals(tree.count, intervals.length, 'interval count ok')
+    var treeIntervals = tree.intervals.slice()
+    treeIntervals.sort(cmpInterval)
+    var expectedIntervals = intervals.slice()
+    expectedIntervals.sort(cmpInterval)
+    t.same(treeIntervals, expectedIntervals, 'intervals same')
 
-    var t = createIntervalTree([[0, 20], [30, 50]]);
+    //Check tree invariants
+    function verifyNode(node, left, right) {
+      if(!node) {
+        return 0
+      }
+      var midp = node.mid
+      t.ok(left < midp && midp < right, 'mid point in range: ' + node.mid + ' in ' + [left,right])
 
-    var count = 0;
-    t.queryInterval(10, 15, function(i) { count++; });
-    if(count != 1) {
-        console.log("I4. Failure!  Found only " + count + " of 1");
-    }
+      //Verify left end points in ascending order
+      var leftP = node.leftPoints.slice()
+      for(var i=0; i<leftP.length; ++ i) {
+        if(i > 0) {
+          t.ok(leftP[i][0] >= leftP[i-1][0], 'order ok')
+        }
+        var y = leftP[i]
+        t.ok(y[0] <= midp && midp <= y[1], 'interval ok')
+      }
 
-    var count = 0;
-    t.queryInterval(25, 26, function(i) { count++; });
-    if(count != 0) {
-        console.log("I5. Failure!  Found " + count + " of 0");
-    }
+      //Verify right end points in ascending order
+      var rightP = node.rightPoints.slice()
+      for(var i=0; i<rightP.length; ++ i) {
+        if(i > 0) {
+          t.ok(rightP[i][1] >= rightP[i-1][1], 'order ok')
+        }
+        var y = rightP[i]
+        t.ok(y[0] <= midp && midp <= y[1], 'interval ok')
+      }
 
-    var count = 0;
-    t.queryInterval(35, 40, function(i) { count++; });
-    if(count != 1) {
-        console.log("I6. Failure!  Found only " + count + " of 1");
+      leftP.sort(cmpInterval)
+      rightP.sort(cmpInterval)
+      t.same(leftP, rightP, 'intervals are consistent')
+
+      var leftCount = verifyNode(node.left, left, node.mid)
+      var rightCount = verifyNode(node.right, node.mid, right)
+      var actualCount = leftCount + rightCount + leftP.length
+      t.equals(node.count, actualCount, 'node count consistent')
+
+      return actualCount
     }
-})();
+    verifyNode(tree.root, -Infinity, Infinity)
+  }
+
+  //Check empty tree
+  verifyTree(createIntervalTree(), [])
+
+  //Try trees with uniformly distributed end points
+  for(var count=0; count<10; ++count) {
+    //Create empty tree and insert 100 intervals
+    var intervals = []
+    var tree = createIntervalTree()
+    for(var i=0; i<100; ++i) {
+      var a = Math.random()
+      var b = a + Math.random()
+      var x = [a,b]
+      intervals.push(x)
+      tree.insert(x)
+    }
+    verifyTree(tree, intervals)
+
+    //Remove half the intervals
+    for(var i=99; i>=50; --i) {
+      tree.remove(intervals.pop())
+    }
+    verifyTree(tree, intervals)
+  }
+
+  //Trees with quantized end points
+  for(var count=0; count<10; ++count) {
+    //Create empty tree and insert 100 intervals
+    var intervals = []
+    var tree = createIntervalTree()
+    for(var i=0; i<100; ++i) {
+      var a = Math.floor(8.0*Math.random())/8.0
+      var b = Math.max(a + Math.floor(8.0*Math.random())/8.0, 1.0)
+      var x = [a,b]
+      intervals.push(x)
+      tree.insert(x)
+    }
+    verifyTree(tree, intervals)
+
+    //Remove half the intervals
+    for(var i=99; i>=50; --i) {
+      tree.remove(intervals.pop())
+    }
+    verifyTree(tree, intervals)
+  }
+
+  var stackIntervals = []
+  for(var i=0; i<100; ++i) {
+    stackIntervals.push([i/200, 1.0-(i/200)])
+  }
+  var tree = createIntervalTree(stackIntervals)
+  verifyTree(tree, stackIntervals)
+
+  t.end()
+})
+
+tape('containment', function(t) {
+  var tree = createIntervalTree([[0, 100]]);
+  var count = 0
+  tree.queryInterval(10, 20, function(i) { count++; })
+  t.equals(count, 1)
+
+  var count = 0;
+  tree.queryInterval(100, 100, function(i) { count++; });
+  t.equals(count, 1)
+
+  var count = 0;
+  tree.queryInterval(110, 111, function(i) { count++; });
+  t.equals(count, 0)
+
+  var tree = createIntervalTree([[0, 20], [30, 50]]);
+  var count = 0;
+  tree.queryInterval(10, 15, function(i) { count++; });
+  t.equals(count, 1)
+
+  var count = 0;
+  tree.queryInterval(25, 26, function(i) { count++; });
+  t.equals(count, 0)
+
+  var count = 0;
+  tree.queryInterval(35, 40, function(i) { count++; });
+  t.equals(count, 1)
+
+  t.end()
+})
