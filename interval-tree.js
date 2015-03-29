@@ -189,12 +189,25 @@ proto.remove = function(interval) {
   }
 }
 
-function compareXBegin(x, y) {
-  return x[0] - y
+function reportLeftRange(arr, hi, cb) {
+  for(var i=0; i<arr.length && arr[i][0] <= hi; ++i) {
+    var r = cb(arr[i])
+    if(r) { return r }
+  }
 }
 
-function compareXEnd(x, y) {
-  return x[1] - y
+function reportRightRange(arr, lo, cb) {
+  for(var i=arr.length-1; i>=0 && arr[i][1] >= lo; --i) {
+    var r = cb(arr[i])
+    if(r) { return r }
+  }
+}
+
+function reportRange(arr, cb) {
+  for(var i=0; i<arr.length; ++i) {
+    var r = cb(arr[i])
+    if(r) { return r }
+  }
 }
 
 proto.queryPoint = function(x, cb) {
@@ -203,40 +216,15 @@ proto.queryPoint = function(x, cb) {
       var r = this.left.queryPoint(x, cb)
       if(r) { return r }
     }
-    var i = bounds.le(this.leftPoints, x, compareXBegin)
-    for(; i>=0; --i) {
-      var r = cb(this.leftPoints[i])
-      if(r) { return r }
-    }
+    return reportLeftRange(this.leftPoints, x, cb)
   } else if(x > this.mid) {
-    var i = bounds.ge(this.rightPoints, x, compareXEnd)
-    for(; i<this.rightPoints.length; ++i) {
-      var r = cb(this.rightPoints[i])
-      if(r) { return r}
-    }
     if(this.right) {
       var r = this.right.queryPoint(x, cb)
       if(r) { return r }
     }
+    return reportRightRange(this.rightPoints, x, cb)
   } else {
-    for(var i=0; i<this.leftPoints.length; ++i) {
-      var r = cb(this.leftPoints[i])
-      if(r) { return r }
-    }
-  }
-}
-
-function reportLeftRange(arr, lo, hi, cb) {
-  for(var i=0; i<arr.length && arr[i][0] <= hi; ++i) {
-    var r = cb(arr[i])
-    if(r) { return r }
-  }
-}
-
-function reportRightRange(arr, lo, hi, cb) {
-  for(var i=arr.length-1; i>=0 && arr[i][1] >= lo; --i) {
-    var r = cb(arr[i])
-    if(r) { return r }
+    return reportRange(this.leftPoints, cb)
   }
 }
 
@@ -250,16 +238,11 @@ proto.queryInterval = function(lo, hi, cb) {
     if(r) { return r }
   }
   if(hi < this.mid) {
-    var r = reportLeftRange(this.leftPoints, lo, hi, cb)
-    if(r) { return r }
+    return reportLeftRange(this.leftPoints, hi, cb)
   } else if(lo > this.mid) {
-    var r = reportRightRange(this.rightPoints, lo, hi, cb)
-    if(r) { return r }
+    return reportRightRange(this.rightPoints, lo, cb)
   } else {
-    for(var i=0; i<this.leftPoints.length; ++i) {
-      var r = cb(this.leftPoints[i])
-      if(r) { return r }
-    }
+    return reportRange(this.leftPoints, cb)
   }
 }
 
