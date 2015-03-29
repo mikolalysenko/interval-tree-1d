@@ -227,17 +227,14 @@ proto.queryPoint = function(x, cb) {
 }
 
 function reportLeftRange(arr, lo, hi, cb) {
-  var b = bounds.gt(arr, hi, compareXBegin)
-  for(var i=0; i<b; ++i) {
+  for(var i=0; i<arr.length && arr[i][0] <= hi; ++i) {
     var r = cb(arr[i])
     if(r) { return r }
   }
 }
 
 function reportRightRange(arr, lo, hi, cb) {
-  var a = bounds.ge(arr, lo, compareXEnd)
-  var b = arr.length
-  for(var i=a; i<b; ++i) {
+  for(var i=arr.length-1; i>=0 && arr[i][1] >= lo; --i) {
     var r = cb(arr[i])
     if(r) { return r }
   }
