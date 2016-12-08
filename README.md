@@ -53,5 +53,9 @@ Visits all intervals containing the point p
 ### `tree.queryInterval(lo, hi, visit(interval))`
 Returns all intervals which intersect the interval `[lo, hi]`
 
+### `tree.isOverlapping(lo, hi, visit(interval))`
+Returns true when the given interval (`[lo, hi]`) overlaps with anything on the tree.
+
+
 # Credits
 (c) 2013-2015 Mikola Lysenko. MIT License

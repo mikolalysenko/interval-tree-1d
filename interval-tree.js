@@ -210,6 +210,27 @@ function reportRange(arr, cb) {
   }
 }
 
+function existsLeftRange(arr, hi) {
+  for(var i=0; i<arr.length && arr[i][0] <= hi; ++i) {
+    return true;
+  }
+  return false;
+}
+
+function existsRightRange(arr, lo) {
+  for(var i=arr.length-1; i>=0 && arr[i][1] >= lo; --i) {
+    return true;
+  }
+  return false;
+}
+
+function existsRange(arr) {
+  for(var i=0; i<arr.length; ++i) {
+    return true;
+  }
+  return false;
+}
+
 proto.queryPoint = function(x, cb) {
   if(x < this.mid) {
     if(this.left) {
@@ -243,6 +264,22 @@ proto.queryInterval = function(lo, hi, cb) {
     return reportRightRange(this.rightPoints, lo, cb)
   } else {
     return reportRange(this.leftPoints, cb)
+  }
+}
+
+proto.isOverlapping = function(lo, hi) {
+  if(lo < this.mid && this.left) {
+    return this.left.isOverlapping(lo, hi)
+  }
+  if(hi > this.mid && this.right) {
+    return this.right.isOverlapping(lo, hi)
+  }
+  if(hi < this.mid) {
+    return existsLeftRange(this.leftPoints, hi)
+  } else if(lo > this.mid) {
+    return existsRightRange(this.rightPoints, lo)
+  } else {
+    return existsRange(this.leftPoints)
   }
 }
 
@@ -336,6 +373,12 @@ tproto.queryPoint = function(p, cb) {
 tproto.queryInterval = function(lo, hi, cb) {
   if(lo <= hi && this.root) {
     return this.root.queryInterval(lo, hi, cb)
+  }
+}
+
+tproto.isOverlapping = function(lo, hi) {
+  if(lo <= hi && this.root) {
+    return this.root.isOverlapping(lo, hi)
   }
 }
 

@@ -206,5 +206,15 @@ tape('containment', function(t) {
   tree.queryInterval(35, 40, incr)
   t.equals(count, 1)
 
+  var tree = createIntervalTree([[0, 20], [30, 50]])
+  
+  t.equals(tree.isOverlapping(10, 15), true);
+
+  t.equals(tree.isOverlapping(25, 26), false);
+  
+  t.equals(tree.isOverlapping(35, 40), true);
+
+  t.equals(tree.isOverlapping(20, 31), true);
+
   t.end()
 })
