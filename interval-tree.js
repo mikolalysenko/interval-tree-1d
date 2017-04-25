@@ -163,7 +163,7 @@ proto.remove = function(interval) {
         this.count = (this.left?this.left.count:0) + (this.right?this.right.count:0) + this.leftPoints.length
       } else if(this.left) {
         copy(this, this.left)
-      } else {
+      } else if(this.right) {
         copy(this, this.right)
       }
       return SUCCESS
