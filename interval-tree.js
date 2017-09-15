@@ -338,7 +338,7 @@ tproto.queryPointExists = function(p) {
     var found = false;
     if(this.root) {
       this.root.queryPoint(p,function(element){
-        console.log(element);
+        //console.log(element);
         found = true;
       });
       return found ? true : false;
