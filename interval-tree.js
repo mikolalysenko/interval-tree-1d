@@ -228,47 +228,6 @@ proto.queryPoint = function(x, cb) {
   }
 }
 
-proto.queryPointExists = function(x) {
-    if(x < this.mid) {
-      if(this.left) {
-        var r = this.left.queryPointExists(x)
-        if(r) { return r }
-      }
-      return reportLeftRangeExists(this.leftPoints, x)
-    } else if(x > this.mid) {
-      if(this.right) {
-        var r = this.right.queryPointExists(x)
-        if(r) { return r }
-      }
-      //console.log(reportRightRangeExists(this.rightPoints, x, cb));
-      return reportRightRangeExists(this.rightPoints, x)
-    } else {
-      return reportRangeExists(this.leftPoints)
-    }
-  }
-
-  function reportLeftRangeExists(arr, hi) {
-    for(var i=0; i<arr.length && arr[i][0] <= hi; ++i) {
-      var r = arr[i];
-      if(r) { return r }
-    }
-  }
-  
-  function reportRightRangeExists(arr, lo) {  
-    //console.log(cb);
-    for(var i=arr.length-1; i>=0 && arr[i][1] >= lo ; --i) {
-        var r = arr[i]
-        if(r) { return r } else { return false}    
-    }
-  }
-  
-  function reportRangeExists(arr) {
-    for(var i=0; i<arr.length; ++i) {
-      var r = arr[i]
-      if(r) { return r }
-    }
-  }
-
 proto.queryInterval = function(lo, hi, cb) {
   if(lo < this.mid && this.left) {
     var r = this.left.queryInterval(lo, hi, cb)
@@ -375,9 +334,16 @@ tproto.queryPoint = function(p, cb) {
 }
 
 tproto.queryPointExists = function(p) {
+  {
+    var found = false;
     if(this.root) {
-      return this.root.queryPointExists(p) ? this.root.queryPointExists(p) : "notfound";
+      this.root.queryPoint(p,function(element){
+        console.log(element);
+        found = true;
+      });
+      return found ? true : false;
     }
+  }
   }
 
 tproto.queryInterval = function(lo, hi, cb) {
