@@ -53,7 +53,7 @@ Visits all intervals containing the point p
 ### `tree.queryInterval(lo, hi, visit(interval))`
 Returns all intervals which intersect the interval `[lo, hi]`
 
-###`tree.queryIntervalExists(p)`
+### `tree.queryIntervalExists(p)`
 Returns true else false if point dosen't exists for the any interval
 
 
