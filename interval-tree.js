@@ -163,7 +163,7 @@ proto.remove = function(interval) {
         this.count = (this.left?this.left.count:0) + (this.right?this.right.count:0) + this.leftPoints.length
       } else if(this.left) {
         copy(this, this.left)
-      } else {
+      } else if(this.right) {
         copy(this, this.right)
       }
       return SUCCESS
@@ -279,6 +279,11 @@ function createIntervalTree(intervals) {
   var centerIntervals = []
   for(var i=0; i<intervals.length; ++i) {
     var s = intervals[i]
+    if(s[1] < s[0]) {
+      var temp = s[0]
+      s[0] = s[1]
+      s[1] = temp
+    }
     if(s[1] < mid) {
       leftIntervals.push(s)
     } else if(mid < s[0]) {
