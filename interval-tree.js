@@ -333,6 +333,19 @@ tproto.queryPoint = function(p, cb) {
   }
 }
 
+tproto.queryPointExists = function(p) {
+  {
+    var found = false;
+    if(this.root) {
+      this.root.queryPoint(p,function(element){
+        //console.log(element);
+        found = true;
+      });
+      return found ? true : false;
+    }
+  }
+  }
+
 tproto.queryInterval = function(lo, hi, cb) {
   if(lo <= hi && this.root) {
     return this.root.queryInterval(lo, hi, cb)
