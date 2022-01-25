@@ -208,3 +208,16 @@ tape('containment', function(t) {
 
   t.end()
 })
+
+tape('tree removal test', function(t){
+  var intervals = [[0, 1], [1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12], [13, 14], [15, 16] ,[90, 100]];
+  var tree = createIntervalTree(intervals)
+
+  var midNode= intervals.length/2
+  for( var i=midNode; i>=0 ;i--){
+    tree.remove(intervals[i]);
+    t.equals(tree.count, intervals.length-(midNode-i+1))
+  }
+ 
+  t.end()
+});
