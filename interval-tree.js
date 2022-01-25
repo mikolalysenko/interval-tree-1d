@@ -98,7 +98,7 @@ proto.insert = function(interval) {
 }
 
 proto.remove = function(interval) {
-  var weight = this.count - this.leftPoints
+  var weight = this.count - this.leftPoints.length
   if(interval[1] < this.mid) {
     if(!this.left) {
       return NOT_FOUND
